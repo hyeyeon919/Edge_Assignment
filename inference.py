@@ -21,7 +21,7 @@ def main():
             model = YOLO(model_path)
 
             # 검증 수행
-            results = model.val(data=coco_yaml_path, imgsz=640, batch=8)
+            results = model.val(data=coco_yaml_path, imgsz=640, batch=8, save_json=False)
 
             # 결과 저장
             f.write(f"Model: {model_name}\n")
