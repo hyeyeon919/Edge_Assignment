@@ -61,7 +61,7 @@ model_fp32 = YOLO("yolov8n.pt")
 model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path)
 
 print("Loading TensorRT FP32 model...")
-tensorrt_fp32 = YOLO("yolov8.engine")
+tensorrt_fp32 = YOLO("yolov8n.engine")
 
 print("Calculating FP32 model metrics on COCO128...")
 dataset_accuracy_fp32, dataset_speed_fp32 = calculate_model_metrics(tensorrt_fp32, dataset_path)
