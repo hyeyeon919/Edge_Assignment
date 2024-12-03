@@ -55,32 +55,38 @@ def calculate_model_metrics(model, dataset_path, batch_size=8):
     mean_accuracy = total_accuracy / image_count
     return mean_accuracy, mean_speed
 
+# FP32 모델 처리
 print("Exporting YOLOv8 TensorRT FP32 model...")
 model_fp32 = YOLO("yolov8n.pt")
-# model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path)
+fp32_engine_file = "yolov8n_fp32.engine"  # FP32 파일 이름 지정
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path, name=fp32_engine_file)
 
 print("Loading TensorRT FP32 model...")
-tensorrt_fp32 = YOLO("yolov8n.engine")
+tensorrt_fp32 = YOLO(fp32_engine_file)
 
 print("Calculating FP32 model metrics on COCO128...")
 dataset_accuracy_fp32, dataset_speed_fp32 = calculate_model_metrics(tensorrt_fp32, dataset_path)
 save_results_to_file(results_file, "TensorRT FP32 (COCO128)", dataset_speed_fp32, dataset_accuracy_fp32)
 
+# FP16 모델 처리
 print("Exporting YOLOv8 TensorRT FP16 model...")
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, half=True, data=yaml_path)
+fp16_engine_file = "yolov8n_fp16.engine"  # FP16 파일 이름 지정
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, half=True, data=yaml_path, name=fp16_engine_file)
 
 print("Loading TensorRT FP16 model...")
-tensorrt_fp16 = YOLO("yolov8n_fp16.engine")
+tensorrt_fp16 = YOLO(fp16_engine_file)
 
 print("Calculating FP16 model metrics on COCO128...")
 dataset_accuracy_fp16, dataset_speed_fp16 = calculate_model_metrics(tensorrt_fp16, dataset_path)
 save_results_to_file(results_file, "TensorRT FP16 (COCO128)", dataset_speed_fp16, dataset_accuracy_fp16)
 
+# INT8 모델 처리
 print("Exporting YOLOv8 TensorRT INT8 model...")
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, data=yaml_path)
+int8_engine_file = "yolov8n_int8.engine"  # INT8 파일 이름 지정
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, data=yaml_path, name=int8_engine_file)
 
 print("Loading TensorRT INT8 model...")
-tensorrt_int8 = YOLO("yolov8nint8.engine")
+tensorrt_int8 = YOLO(int8_engine_file)
 
 print("Calculating INT8 model metrics on COCO128...")
 dataset_accuracy_int8, dataset_speed_int8 = calculate_model_metrics(tensorrt_int8, dataset_path)
