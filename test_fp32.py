@@ -38,11 +38,10 @@ def calculate_model_metrics(model, dataset_path):
 # FP32 모델 처리
 print("Exporting YOLOv8 TensorRT FP32 model...")
 model_fp32 = YOLO("yolov8n.pt")
-default_fp32_engine = "yolov8.engine"
 model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path)
 
 print("Loading TensorRT FP32 model...")
-tensorrt_fp32 = YOLO(fp32_engine_file)
+tensorrt_fp32 = YOLO("yolov8.engine")
 
 print("Calculating FP32 model metrics on COCO128...")
 dataset_accuracy_fp32, dataset_speed_fp32 = calculate_model_metrics(tensorrt_fp32, dataset_path)
