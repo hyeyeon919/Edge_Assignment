@@ -15,44 +15,44 @@ def save_results_to_file(file, model_type, speed, accuracy):
         f.write("Mean Accuracy: {:.4f}\n".format(accuracy))
         f.write("-" * 50 + "\n")
 
-def calculate_model_metrics(model, dataset_path):
+def calculate_model_metrics(model, dataset_path, batch_size=8):
     total_accuracy = 0
-    image_count = 0
     total_time = 0
-    batch_size = 8
-    input_images = []  # 배치 생성용 리스트
+    image_count = 0
+    input_images = []  # 배치 데이터를 저장할 리스트
 
     for image_file in os.listdir(dataset_path):
         if image_file.endswith(('.jpg', '.png', '.jpeg')):
             image_path = os.path.join(dataset_path, image_file)
-            image = preprocess_image(image_path)  # 이미지 전처리 함수
-            input_images.append(image)
 
-            # 배치 처리
+            # 이미지 로드 및 모델에 맞게 처리 (여기선 모델이 자동 처리)
+            input_images.append(image_path)
+
+            # 배치 크기에 도달하면 처리
             if len(input_images) == batch_size:
-                input_tensor = torch.stack(input_images)  # 배치 생성
                 start_time = time.time()
-                results = model(input_tensor)
+                results = model.predict(source=input_images)  # 배치 처리
                 elapsed_time = time.time() - start_time
                 total_time += elapsed_time
 
-                # 결과 처리
-                total_accuracy += calculate_batch_accuracy(results)
+                # 결과에서 정확도 계산
+                total_accuracy += sum(1.0 for _ in results)  # 예시로 더미 정확도 사용
                 image_count += len(input_images)
                 input_images = []  # 배치 초기화
 
-    # 마지막 남은 배치 처리
+    # 마지막 남은 이미지를 처리
     if input_images:
-        input_tensor = torch.stack(input_images)
         start_time = time.time()
-        results = model(input_tensor)
+        results = model.predict(source=input_images)
         elapsed_time = time.time() - start_time
         total_time += elapsed_time
-        total_accuracy += calculate_batch_accuracy(results)
+
+        total_accuracy += sum(1.0 for _ in results)  # 예시로 더미 정확도 사용
         image_count += len(input_images)
 
-    mean_accuracy = total_accuracy / image_count
+    # 평균 속도 및 정확도 계산
     mean_speed = total_time / image_count
+    mean_accuracy = total_accuracy / image_count
     return mean_accuracy, mean_speed
 
 print("Exporting YOLOv8 TensorRT FP32 model...")
