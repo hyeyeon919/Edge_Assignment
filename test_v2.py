@@ -35,11 +35,18 @@ def calculate_model_metrics(model, dataset_path):
     mean_speed = total_time / image_count
     return mean_accuracy, mean_speed
 
+def rename_file_if_needed(original_file, target_file):
+    if os.path.exists(original_file) and original_file != target_file:
+        os.rename(original_file, target_file)
+        print(f"File renamed from {original_file} to {target_file}")
+
 # FP32 모델 처리
 print("Exporting YOLOv8 TensorRT FP32 model...")
 model_fp32 = YOLO("yolov8n.pt")
+default_fp32_engine = "yolov8.engine"
 fp32_engine_file = "yolov8n_fp32.engine"  # FP32 파일 이름 지정
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path, name=fp32_engine_file)
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, data=yaml_path)
+rename_file_if_needed(default_fp32_engine, fp32_engine_file)
 
 print("Loading TensorRT FP32 model...")
 tensorrt_fp32 = YOLO(fp32_engine_file)
@@ -50,8 +57,10 @@ save_results_to_file(results_file, "TensorRT FP32 (COCO128)", dataset_speed_fp32
 
 # FP16 모델 처리
 print("Exporting YOLOv8 TensorRT FP16 model...")
+default_fp16_engine = "yolov8.engine"
 fp16_engine_file = "yolov8n_fp16.engine"  # FP16 파일 이름 지정
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, half=True, data=yaml_path, name=fp16_engine_file)
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, half=True, data=yaml_path)
+rename_file_if_needed(default_fp16_engine, fp16_engine_file)
 
 print("Loading TensorRT FP16 model...")
 tensorrt_fp16 = YOLO(fp16_engine_file)
@@ -62,8 +71,10 @@ save_results_to_file(results_file, "TensorRT FP16 (COCO128)", dataset_speed_fp16
 
 # INT8 모델 처리
 print("Exporting YOLOv8 TensorRT INT8 model...")
+default_int8_engine = "yolov8.engine"
 int8_engine_file = "yolov8n_int8.engine"  # INT8 파일 이름 지정
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, data=yaml_path, name=int8_engine_file)
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, data=yaml_path)
+rename_file_if_needed(default_int8_engine, int8_engine_file)
 
 print("Loading TensorRT INT8 model...")
 tensorrt_int8 = YOLO(int8_engine_file)
