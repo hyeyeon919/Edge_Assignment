@@ -9,4 +9,4 @@ yaml_path = "./coco128.yaml"  # coco128.yaml 경로를 지정
 # FP32 모델 처리
 print("Exporting YOLOv8 TensorRT INT8 model...")
 model_fp32 = YOLO("yolov8n.pt")
-model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, data=yaml_path)
+model_fp32.export(format="engine", dynamic=False, batch=8, workspace=4, int8=True, imgsz=640, data=yaml_path)
